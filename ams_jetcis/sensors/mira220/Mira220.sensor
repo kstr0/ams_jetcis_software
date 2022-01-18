@@ -1,0 +1,39 @@
+[Description]
+Name = Mira_220
+Comment = 'ams Mira220 image sensor'
+
+[Sensor]
+defFormat = Init_sensor
+gstInterface = v4l2src
+gstPipe = color
+#gstInterface = 0
+#gstPipe = grey
+i2cID = 54
+#DevtreeImg = ./ams_jetcis/sensors/mira220/dtb.img
+#KernelImg = ./ams_jetcis/sensors/mira220/kernel.img
+DevtreeImgNano = ./ams_jetcis/sensors/mira220/dtbnano.dtb
+KernelImgNano = ./ams_jetcis/sensors/mira220/kernelnano.img
+camera_overrides = ./ams_jetcis/sensors/mira220/camera_overrides.isp
+
+[Format]
+Init_sensor = ./ams_jetcis/sensors/mira220/config_files/mira220_1600x1400_30fps_12b.py
+
+
+[Control]
+ROI = ./ams_jetcis/sensors/mira220/gui_controls/roi.py
+BitDepth = ./ams_jetcis/sensors/mira220/gui_controls/bit_depth.py
+FrameRate = ./ams_jetcis/sensors/mira220/gui_controls/frame_rate.py
+ExposureTime = ./ams_jetcis/sensors/mira220/gui_controls/exposure_time.py
+AnalogGain = ./ams_jetcis/sensors/mira220/gui_controls/analog_gain.py
+ReadOrder = ./ams_jetcis/sensors/mira220/gui_controls/read_order.py
+RowCorrection = ./ams_jetcis/sensors/mira220/gui_controls/row_correction.py
+DefectCorrectionMethod = ./ams_jetcis/sensors/mira220/gui_controls/defect_correction_method.py
+DefectCorrectionLimits = ./ams_jetcis/sensors/mira220/gui_controls/defect_correction_limits.py
+TestImage = ./ams_jetcis/sensors/mira220/gui_controls/test_image.py
+Illumination = ./ams_jetcis/sensors/mira220/gui_controls/illumination.py
+Context = ./ams_jetcis/sensors/mira220/gui_controls/context.py
+ReadAddress = ./ams_jetcis/sensors/mira220/gui_controls/read_address.py
+WriteAddress = ./ams_jetcis/sensors/mira220/gui_controls/write_address.py
+
+
+[Batch]

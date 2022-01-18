@@ -1,0 +1,55 @@
+[Description]
+Name = Mira050
+Comment = 'ams Mira050 image sensor'
+
+[Sensor]
+defFormat = 600x800_30fps_10b_pixel_normal_gain1
+gstInterface = v4l2src
+gstPipe = color
+#gstInterface = 0
+#gstPipe = grey
+i2cID = 36
+#DevtreeImg = ./ams_jetcis/sensors/mira050/dtb.img
+#KernelImg = ./ams_jetcis/sensors/mira050/kernel.img
+DevtreeImgNano = ./ams_jetcis/sensors/mira050/dtbnano.dtb
+KernelImgNano = ./ams_jetcis/sensors/mira050/kernelnano.img
+camera_overrides = ./ams_jetcis/sensors/mira050/camera_overrides.isp
+
+[Format]
+
+600x800_30fps_10b_pixel_normal_gain1     = ./ams_jetcis/sensors/mira050/config_files/800_600_10b_mira050_normal_gain1_patch.py
+#600x800_60fps_10b_pixel_normal_gain1     = ./ams_jetcis/sensors/mira050/config_files/800_600_10b_mira050_normal_gain1_patch_60fps.py
+#600x800_90fps_10b_pixel_normal_gain1     = ./ams_jetcis/sensors/mira050/config_files/800_600_10b_mira050_normal_gain1_patch_90fps.py
+
+#600x800_30fps_10b_pixel_normal_gain2     = ./ams_jetcis/sensors/mira050/config_files/800_600_10b_mira050_normal_gain2_patch.py
+#600x800_30fps_10b_pixel_normal_gain4     = ./ams_jetcis/sensors/mira050/config_files/800_600_10b_mira050_normal_gain4_patch.py
+
+#600x800_30fps_12b_pixel_normal_gain1     = ./ams_jetcis/sensors/mira050/config_files/800_600_12b_mira050_normal_gain1_patch.py
+#600x800_60fps_12b_pixel_normal_gain1     = ./ams_jetcis/sensors/mira050/config_files/800_600_12b_mira050_normal_gain1_patch_60fps.py
+#600x800_90fps_12b_pixel_normal_gain1     = ./ams_jetcis/sensors/mira050/config_files/800_600_12b_mira050_normal_gain1_patch_90fps.py
+#600x800_30fps_12b_pixel_normal_gain2     = ./ams_jetcis/sensors/mira050/config_files/800_600_12b_mira050_normal_gain2_patch.py
+#600x800_30fps_12b_pixel_normal_gain4     = ./ams_jetcis/sensors/mira050/config_files/800_600_12b_mira050_normal_gain4_patch.py
+
+#600x800_200fps_10b_pixel_highspeed_gain1     = ./ams_jetcis/sensors/mira050/config_files/800_600_10b_mira050_highspeed_gain1_patch.py
+#600x800_200fps_10b_pixel_highspeed_gain2     = ./ams_jetcis/sensors/mira050/config_files/800_600_10b_mira050_highspeed_gain2_patch.py
+#600x800_200fps_10b_pixel_highspeed_gain4     = ./ams_jetcis/sensors/mira050/config_files/800_600_10b_mira050_highspeed_gain4_patch.py
+
+#600x800_60fps_10b_logic = ./ams_jetcis/sensors/mira050/config_files/800_600_10b_mira050_logic.py
+#640x480_60fps_10b_logic = ./ams_jetcis/sensors/mira050/config_files/640x480_10b_mira050.py
+#640x480_60fps_12b_logic = ./ams_jetcis/sensors/mira050/config_files/640x480_12b_mira050.py
+
+[Control]
+ExposureTime = ./ams_jetcis/sensors/mira050/gui_controls/exposure_time.py
+bit_depth = ./ams_jetcis/sensors/mira050/gui_controls/bit_depth.py
+
+#   CPTRIM = ./ams_jetcis/sensors/mira050/gui_controls/CP_TRIM.py
+analog_gain = ./ams_jetcis/sensors/mira050/gui_controls/analog_gain.py
+digital_gain = ./ams_jetcis/sensors/mira050/gui_controls/digital_gain.py
+illum = ./ams_jetcis/sensors/mira050/gui_controls/illumination.py
+
+Blacksun = ./ams_jetcis/sensors/mira050/gui_controls/blacksun.py
+DefectCorrection=./ams_jetcis/sensors/mira050/gui_controls/defect_correction.py
+Mirror = ./ams_jetcis/sensors/mira050/gui_controls/mirror.py
+ReadAddress = ./ams_jetcis/sensors/mira050/gui_controls/read_address.py
+WriteAddress = ./ams_jetcis/sensors/mira050/gui_controls/write_address.py
+[Batch]

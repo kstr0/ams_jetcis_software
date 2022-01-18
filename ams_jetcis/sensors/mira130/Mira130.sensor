@@ -1,0 +1,40 @@
+[Description]
+Name = Mira_130_new
+Comment = 'ams Mira130 image sensor'
+
+[Sensor]
+defFormat = FullRes10bpp30fps
+gstInterface = v4l2src
+gstPipe = color
+#gstInterface = 0
+#gstPipe = grey
+i2cID = 30
+DevtreeImg = ./ams_jetcis/sensors/mira130/dtb.img
+KernelImg = ./ams_jetcis/sensors/mira130/kernel.img
+DevtreeImgNano = ./ams_jetcis/sensors/mira130/dtbnano.dtb
+KernelImgNano = ./ams_jetcis/sensors/mira130/kernelnano.img
+camera_overrides = ./ams_jetcis/sensors/mira130/camera_overrides.isp
+
+[Format]
+FullRes10bpp30fps = ./ams_jetcis/sensors/mira130/config_files/fullres.py
+#FullRes10bpp60fps = ./ams_jetcis/sensors/mira130/config_files/fullres60fps.py
+#HalfRes10bpp30fps = ./ams_jetcis/sensors/mira130/config_files/halfres.py
+
+[Control]
+ExposureTime = ./ams_jetcis/sensors/mira130/gui_controls/exposure_time.py
+#FrameLength = ./ams_jetcis/sensors/mira130/gui_controls/frame_length.py
+AnalogGain = ./ams_jetcis/sensors/mira130/gui_controls/analog_gain_old.py
+#DigitalGain = ./ams_jetcis/sensors/mira130/gui_controls/digital_gain.py
+HDR = ./ams_jetcis/sensors/mira130/gui_controls/hdr.py
+#HDRVoltage = ./ams_jetcis/sensors/mira130/gui_controls/hdr_voltage.py
+#HDRC = ./ams_jetcis/sensors/mira130/gui_controls/hdrc.py
+ReadOrder = ./ams_jetcis/sensors/mira130/gui_controls/read_order.py
+TestImage = ./ams_jetcis/sensors/mira130/gui_controls/test_image.py
+PMSIL = ./ams_jetcis/sensors/mira130/gui_controls/PMSIL.py
+BLC = ./ams_jetcis/sensors/mira130/gui_controls/blc.py
+ReadAddress = ./ams_jetcis/sensors/mira130/gui_controls/read_address.py
+WriteAddress = ./ams_jetcis/sensors/mira130/gui_controls/write_address.py
+
+[Batch]
+#enableTP = ./ams_jetcis/sensors/mira130/gui_controls/enableTP.py
+#disableTP = ./ams_jetcis/sensors/mira130/gui_controls/disableTP.py

@@ -1,0 +1,23 @@
+[Description]
+Name = Dummy
+Comment = 'Simple testpattern sensor without hardware access'
+
+[Sensor]
+defFormat = FullHD
+gstInterface = videotestsrc ! video/x-raw,framerate=30/1,width=1920,height=1080
+gstPipe = color
+
+[Format]
+FullHD = ./Dummy/fullhd.py
+VGA = ./Dummy/vga.py
+
+[Control]
+Again = ./Dummy/again.py
+Dgain = ./Dummy/dgain.py
+noSetting = ./Dummy/nosetting.py
+specialModes = ./Dummy/specialModes.py
+
+
+[Batch]
+enableTP = ./Dummy/enableTP.py
+disableTP = ./Dummy/disableTP.py

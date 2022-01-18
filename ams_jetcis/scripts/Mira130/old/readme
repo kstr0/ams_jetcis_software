@@ -1,0 +1,8 @@
+how to use:
+
+right click -> open terminal here.
+
+enter this in the console:
+python3 raw_opencv_capture.py 
+python3 dualcam.py (requires 2 cameras attached.)
+

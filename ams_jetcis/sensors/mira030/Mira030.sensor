@@ -1,0 +1,46 @@
+[Description]
+Name = Mira_030
+Comment = 'ams Mira030 image sensor'
+
+[Sensor]
+defFormat = 640x480_30fps_12b
+gstInterface = v4l2src
+gstPipe = color
+#gstInterface = 0
+#gstPipe = grey
+i2cID = 30
+#DevtreeImg = ./ams_jetcis/sensors/mira030/dtb.img
+#KernelImg = ./ams_jetcis/sensors/mira030/kernel.img
+DevtreeImgNano = ./ams_jetcis/sensors/mira030/dtbnano.dtb
+KernelImgNano = ./ams_jetcis/sensors/mira030/kernelnano.img
+camera_overrides = ./ams_jetcis/sensors/mira030/camera_overrides.isp
+
+[Format]
+640x480_30fps_8b = ./ams_jetcis/sensors/mira030/config_files/mira030_640x480_30fps_8b_2lane.py
+640x480_60fps_8b = ./ams_jetcis/sensors/mira030/config_files/mira030_640x480_60fps_8b_2lane.py
+640x480_30fps_10b = ./ams_jetcis/sensors/mira030/config_files/mira030_640x480_30fps_10b_2lane.py
+640x480_60fps_10b = ./ams_jetcis/sensors/mira030/config_files/mira030_640x480_60fps_10b_2lane.py
+640x480_30fps_12b = ./ams_jetcis/sensors/mira030/config_files/mira030_640x480_30fps_12b_2lane.py
+640x480_60fps_12b = ./ams_jetcis/sensors/mira030/config_files/mira030_640x480_60fps_12b_2lane.py
+480x360_30fps_8b = ./ams_jetcis/sensors/mira030/config_files/mira030_480x360_30fps_8b_2lane.py
+480x360_60fps_8b = ./ams_jetcis/sensors/mira030/config_files/mira030_480x360_60fps_8b_2lane.py
+480x360_30fps_10b = ./ams_jetcis/sensors/mira030/config_files/mira030_480x360_30fps_10b_2lane.py
+480x360_60fps_10b = ./ams_jetcis/sensors/mira030/config_files/mira030_480x360_60fps_10b_2lane.py
+480x360_30fps_12b = ./ams_jetcis/sensors/mira030/config_files/mira030_480x360_30fps_12b_2lane.py
+480x360_60fps_12b = ./ams_jetcis/sensors/mira030/config_files/mira030_480x360_60fps_12b_2lane.py
+640x480_30fps_8b_1lane = ./ams_jetcis/sensors/mira030/config_files/mira030_640x480_50fps_8b_2lane.py
+
+
+[Control]
+ExposureTime = ./ams_jetcis/sensors/mira030/gui_controls/exposure_time.py
+FrameRate = ./ams_jetcis/sensors/mira030/gui_controls/frame_rate.py
+AnalogGain = ./ams_jetcis/sensors/mira030/gui_controls/analog_gain.py
+DigitalGain = ./ams_jetcis/sensors/mira030/gui_controls/digital_gain.py
+ReadOrder = ./ams_jetcis/sensors/mira030/gui_controls/read_order.py
+TestImage = ./ams_jetcis/sensors/mira030/gui_controls/test_image.py
+BLC = ./ams_jetcis/sensors/mira030/gui_controls/blc.py
+BLCTarget = ./ams_jetcis/sensors/mira030/gui_controls/blc_target.py
+ReadAddress = ./ams_jetcis/sensors/mira030/gui_controls/read_address.py
+WriteAddress = ./ams_jetcis/sensors/mira030/gui_controls/write_address.py
+
+[Batch]
