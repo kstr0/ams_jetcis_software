@@ -78,3 +78,13 @@ class Sensor(ABC):
     @abstractmethod
     def read_register(self, *args, **kwargs):
         pass
+
+#abstract setters and getters
+    @property
+    def exposure_us(self):
+        pass
+
+    @exposure_us.setter
+    @abstractmethod
+    def exposure_us(self, val):
+        pass

@@ -36,11 +36,11 @@ class Mira050(Sensor):
         self.sensor_i2c = 54
         self.sensor_type = 1
         self.bit_mode = ''
-        self.digital_gain = 1
-        self.analog_gain = 1
+        self._digital_gain = 1
+        self._analog_gain = 1
         self.bsp = 1
         self.mirror = 0
-        self.exposure_us = 1000
+        self._exposure_us = 1000
         self.pixel_correction = 1
         self.temp_cor=True
         self.temperature = None
@@ -776,7 +776,7 @@ class Mira050(Sensor):
 
 
     def set_exposure_us(self, time_us):
-        self.exposure_us = time_us
+        self._exposure_us = time_us
         imager = self.imager
         imager.setSensorI2C(self.sensor_i2c)
         imager.type(self.sensor_type)
@@ -821,29 +821,6 @@ class Mira050(Sensor):
         return super().read_register(address)
 
 
-
-
-    def set_exposure_us(self, time_us):
-        self.exposure_us = time_us
-        imager = self.imager
-        imager.setSensorI2C(self.sensor_i2c)
-        imager.type(self.sensor_type)
-
-        value = int(time_us)
-
-        # Split value
-        b3 = value >> 24 & 255
-        b2 = value >> 16 & 255
-        b1 = value >> 8 & 255
-        b0 = value & 255
-
-        imager.write(0xe004,  0)
-        imager.write(0xe000,  1)
-        imager.write(0x000E, b3)
-        imager.write(0x000F, b2)
-        imager.write(0x0010, b1)
-        imager.write(0x0011, b0)
-
     def set_analog_gain(self, gain):
         return super().set_analog_gain(gain)
 
@@ -867,3 +844,95 @@ class Mira050(Sensor):
 
     def read_register(self, address):
         return super().read_register(address)
+
+
+#######setters and getters########
+        # self.sensor_i2c = 54
+        # self.sensor_type = 1
+        # self.bit_mode = ''
+        # self.digital_gain = 1
+        # self.analog_gain = 1
+        # self.bsp = 1
+        # self.mirror = 0
+        # self.exposure_us = 1000
+        # self.pixel_correction = 1
+        # self.temp_cor=True
+        # self.temperature = None
+        # self.low_fpn=True
+        # self.illum = False
+        # self.clock = 38.4
+
+    @property
+    def analog_gain(self):
+        '''Get the programmed exposure time.
+
+        Returns
+        -------
+        float : 
+            exposure time in us
+        '''
+        print('property exposure called')
+        return self._analog_gain    
+
+    @analog_gain.setter
+    def analog_gain(self, analog_gain):
+        '''Set analog gain and related registers.
+
+        Parameters
+        ----------
+        gain : int
+            Analog gain (1, 2 or 4)
+        '''
+        print('setting again with setter')
+        self.set_analog_gain(analog_gain)
+
+
+
+    @property
+    def digital_gain(self):
+        '''Get the programmed exposure time.
+
+        Returns
+        -------
+        float : 
+            exposure time in us
+        '''
+        print('property exposure called')
+        return self._digital_gain    
+
+    @digital_gain.setter
+    def digital_gain(self, digital_gain):
+        '''Set analog gain and related registers.
+
+        Parameters
+        ----------
+        gain : int
+            Analog gain (1, 2 or 4)
+        '''
+        print('setting again with setter')
+        self.set_digital_gain(digital_gain)
+
+
+    @property
+    def exposure_us(self):
+        '''Get the programmed exposure time.
+
+        Returns
+        -------
+        float : 
+            exposure time in us
+        '''
+        print('property exposure called')
+        return self._exposure_us    
+
+    @exposure_us.setter
+    def exposure_us(self, time_us):
+        '''Set the exposure time in us in master mode.
+
+        Parameters
+        ----------
+        exposure : float
+            Exposure time of the sensor
+        '''
+        print('setting exposure with setter')
+        self.set_exposure_us(time_us)
