@@ -483,7 +483,7 @@ class Mira050(Sensor):
             self.init_from_config(self.config_parser(self.mode_table[bit_mode][analog_gain]))
 
         self.bit_mode = bit_mode
-        self.analog_gain= analog_gain
+        self._analog_gain= analog_gain
         self.set_bsp(self.bsp)
         self.set_pixel_correction(self.pixel_correction)
         self.set_digital_gain(self.digital_gain)
@@ -587,8 +587,6 @@ class Mira050(Sensor):
             )
         # Character "ETX" (0x03) indicates the end of the wafer ID string
         wafer_id_bytes = bytes_arr.split(b'\x03')[0]
-        print(f'id bytes: {wafer_id_bytes}')
-
         return wafer_id_bytes.decode('utf-8')
 
     def get_wafer_x_location(self) -> int:
@@ -797,8 +795,9 @@ class Mira050(Sensor):
         imager.write(0x0011, b0)
 
     def set_analog_gain(self, gain):
-        return super().set_analog_gain(gain)
+        self.init_sensor(self, bit_mode=self.bit_mode, fps=self.fps, w=self.width, h=self.height, nb_lanes=1, analog_gain=gain)
 
+    
     def set_digital_gain(self, gain):
         imager = self.imager
         imager.setSensorI2C(self.sensor_i2c)
@@ -830,7 +829,7 @@ class Mira050(Sensor):
         imager.type(self.sensor_type)
 
         gain = int(gain*16-1)
-        self.digital_gain = float((gain+1)/16)
+        self._digital_gain = float((gain+1)/16)
         # Get the driver access
         imager.setSensorI2C(0x36)
         imager.type(1)

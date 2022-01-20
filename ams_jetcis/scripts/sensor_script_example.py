@@ -354,7 +354,7 @@ def get_otp_050(sensor='mira050'):
     sensor.cold_start()
     sensor.init_sensor(bit_mode='10bit', analog_gain=2)
     # exposures = range(100, 50000, 3000)
-    print(f'id: {sensor.get_wafer_id()}')
+    print(f'wafer id: {sensor.get_wafer_id()}')
     print(f'x: {sensor.get_wafer_x_location()}')
     print(f'y: {sensor.get_wafer_y_location()}')
     print(f'chucktemp1: {sensor.get_temp_wafer()}')
@@ -853,7 +853,7 @@ def run():
     # test stability switching between v4l2 and gstreamer pipeline
     # test_mira220()
     # test_sensor_type()
-    test_mira050()
+    # test_mira050()
     # test_mira130()
     # test_mira030()
     # test_mira050_lowfpn()
