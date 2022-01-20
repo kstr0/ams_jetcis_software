@@ -34,17 +34,17 @@ from ams_jetcis.sensors.mira130.mira130 import Mira130
 from ams_jetcis.sensors.mira050.mira050 import Mira050
 from ams_jetcis.sensors.mira030.mira030 import Mira030
 from ams_jetcis.common.driver_access import ImagerTools
-import mira_xs_api
-from mira_xs_api.mira_xs_api import MiraXS_API
-from mira_xs_api.calibration import (
-    upload_device_specific_black_level,
-    upload_device_specific_trim_settings)
-from mira_xs_api.sensor_input_interfaces.SensorModelInterface import (
-        AddressBasedProgrammingSequence,
-        NameBasedProgrammingSequence,
-        NameBasedWriteInstruction,
-        ProgrammingSequence
-    )
+# import mira_xs_api
+# from mira_xs_api.mira_xs_api import MiraXS_API
+# from mira_xs_api.calibration import (
+#     upload_device_specific_black_level,
+#     upload_device_specific_trim_settings)
+# from mira_xs_api.sensor_input_interfaces.SensorModelInterface import (
+#         AddressBasedProgrammingSequence,
+#         NameBasedProgrammingSequence,
+#         NameBasedWriteInstruction,
+#         ProgrammingSequence
+#     )
 import ams_jetcis.scripts.plotter as plotter
 
 # import ams_jetcis.characterization.standard_tests.ptc as char
@@ -849,7 +849,7 @@ def run():
     #     # show_pcb_temperature('Mira220', port, '12bit', 30, 1600, 1400, 2, 1)
 
     # test_miraxs_api()
-    test_mira130()
+    # test_mira130()
     # test stability switching between v4l2 and gstreamer pipeline
     # test_mira220()
     # test_sensor_type()
@@ -857,7 +857,7 @@ def run():
     # test_mira130()
     # test_mira030()
     # test_mira050_lowfpn()
-    # get_otp_050()
+    get_otp_050()
     #test_sensor_type()
     # check_calibrate_mira050()
     # automated_measurement()

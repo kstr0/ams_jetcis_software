@@ -7,11 +7,6 @@ from ams_jetcis.sensors.mira030.mira030 import Mira030
 from ams_jetcis.common.driver_access import ImagerTools
 
 imagertools = ImagerTools(printfun=None, port=0, rootPW = 'jetcis')
-# sensor = Mira050(imagertools)
-# sensor.exposure_us=sensor.exposure_us
-# sensor = Mira220(imagertools)
-# sensor.exposure_us=sensor.exposure_us
-sensor = Mira130(imagertools)
+sensor = Mira050(imagertools)
 sensor.exposure_us=sensor.exposure_us
-# sensor = Mira030(imagertools)
-# sensor.exposure_us=sensor.exposure_us
+sensor.analog_gain=sensor.analog_gain
