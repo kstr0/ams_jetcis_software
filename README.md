@@ -18,9 +18,13 @@ https://ams.com/area-scan-sensors
 This guide requires an nvidia jetson nano B01 with 4 GB ram. Other versions will NOT work.
 
 Software: https://github.com/ams-sensors/ams_jetcis_software
+
 Microcontroller: https://github.com/ams-sensors/ams_jetcis_microcontroller
+
 Kernel: https://github.com/ams-sensors/ams_jetcis_kernel
+
 Hardware: https://github.com/ams-sensors/ams_jetcis_hardware
+
 
 
 # Preparing the jetson nano
