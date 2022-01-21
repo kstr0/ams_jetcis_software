@@ -1,11 +1,19 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
-	![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
-    	![nVIDIA](https://img.shields.io/badge/nVIDIA-%2376B900.svg?style=for-the-badge&logo=nVIDIA&logoColor=white)
-        ![Linux](https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black)
-        ![GitHub](https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white)
+![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
+![nVIDIA](https://img.shields.io/badge/nVIDIA-%2376B900.svg?style=for-the-badge&logo=nVIDIA&logoColor=white)
+![Linux](https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black)
+![GitHub](https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white)
+
+<a href="https://ams.com/area-scan-sensors">
+<img src="https://upload.wikimedia.org/wikipedia/commons/3/32/Ams_AG_Logo.svg" alt="ams logo" width="200" title="ams logo" border="0"/>
+</a>
+
 
 # ams_jetcis_software
-Python code for jetson nano evaluation kit.
+Python code to evaluate ams image sensors for jetson nano evaluation kit.
+To be more specific, the global shutter, NIR-enhanced MIPI sensors from ams.
+
+https://ams.com/area-scan-sensors
 
 This guide requires an nvidia jetson nano B01 with 4 GB ram. Other versions will NOT work.
 
@@ -99,5 +107,5 @@ install it with
 ### TBD
 add console script to fully replace the install script
 upload to pypi
-
+pytest
 
