@@ -1,4 +1,5 @@
 #!/bin/bash
+#this file is obsolete in the future
 echo "building installer archive"
 echo "please do not commit this archive to svn"
 version='2.4.0-rc5' #$(awk '/version/{print $NF}' ./ams_jetcis/config.cfg)
