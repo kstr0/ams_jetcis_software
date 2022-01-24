@@ -9,7 +9,7 @@
 </a>
 
 
-# ams_jetcis_software
+# ams_jetcis_software for MIRA image sensors
 Python code to evaluate ams image sensors for jetson nano evaluation kit.
 To be more specific, the global shutter, NIR-enhanced MIPI sensors from ams.
 
