@@ -41,7 +41,7 @@ class Mira050(Sensor):
         self.bsp = 1
         self.mirror = 0
         self._exposure_us = 1000
-        self.pixel_correction = 1
+        self.pixel_correction = 0
         self.temp_cor=True
         self.temperature = None
         self.low_fpn=True
