@@ -73,7 +73,9 @@ class Mira050(Sensor):
             '10bit': {
                 1: r'low_fpn/10-bit mode_anagain1_60fps_exp0.1ms_continuous_clk_datarate_1200_mclk_24.txt', \
                 2: r'low_fpn/10-bit mode_anagain2_60fps_exp0.1ms_continuous_clk_datarate_1200_mclk_24.txt', \
-                4: r'low_fpn/10-bit mode_anagain4_60fps_exp0.1ms_continuous_clk_datarate_1200_mclk_24.txt'}, \
+                4: r'low_fpn/10-bit mode_anagain4_60fps_exp0.1ms_continuous_clk_datarate_1200_mclk_24.txt', \
+                8: r'low_fpn/10_anagain8_30fps_exp0.1ms_continuous_clk_datarate_1200_mclk_24.txt', \
+                16: r'low_fpn/10_anagain16_30fps_exp0.1ms_continuous_clk_datarate_1200_mclk_24.txt'}, \
             '10bithighspeed': {
                 1: r'low_fpn/10-bit high speed mode_anagain1_60fps_exp0.1ms_continuous_clk_datarate_1200_mclk_24.txt', \
                 2: r'low_fpn/10-bit high speed mode_anagain2_60fps_exp0.1ms_continuous_clk_datarate_1200_mclk_24.txt', \
@@ -91,7 +93,11 @@ class Mira050(Sensor):
             '10bit': {
                 1: r'low_fpn/10-bit mode_anagain1_60fps_exp0.1ms_continuous_clk_datarate_1200_mclk_38.txt', \
                 2: r'low_fpn/10-bit mode_anagain2_60fps_exp0.1ms_continuous_clk_datarate_1200_mclk_38.txt', \
-                4: r'low_fpn/10-bit mode_anagain4_60fps_exp0.1ms_continuous_clk_datarate_1200_mclk_38.txt'}, \
+                4: r'low_fpn/10-bit mode_anagain4_60fps_exp0.1ms_continuous_clk_datarate_1200_mclk_38.txt', \
+                8: r'low_fpn/10_anagain8_30fps_exp0.1ms_continuous_clk_datarate_1200_mclk_38.txt', \
+                16: r'low_fpn/10_anagain16_30fps_exp0.1ms_continuous_clk_datarate_1200_mclk_38.txt'}, \
+
+
             '10bithighspeed': {
                 1: r'low_fpn/10-bit high speed mode_anagain1_60fps_exp0.1ms_continuous_clk_datarate_1200_mclk_38.txt', \
                 2: r'low_fpn/10-bit high speed mode_anagain2_60fps_exp0.1ms_continuous_clk_datarate_1200_mclk_38.txt', \
@@ -452,8 +458,8 @@ class Mira050(Sensor):
         supported analog gains: 1 2 4
         """
         try: #do some checks
-            assert(bit_mode in self.mode_table_low_fpn_24.keys())
-            assert(analog_gain in self.mode_table_low_fpn_24[bit_mode].keys())
+            assert(bit_mode in self.mode_table_low_fpn_38.keys())
+            assert(analog_gain in self.mode_table_low_fpn_38[bit_mode].keys())
         except AssertionError:
             message = f"Supported modes: {self.mode_table_low_fpn_24.keys()} gains: {self.mode_table_low_fpn_38['10bit'].keys()}"
             raise Mira050ConfigError(bit_mode=bit_mode, analog_gain = analog_gain, message = message)
@@ -496,8 +502,7 @@ class Mira050(Sensor):
         if self.bpp==8:
             self.widthDMA = 640
         self.framerate = 60
-        self.analog_gain = analog_gain
-        self.set_black_level(temperature = self.temperature) #self.get_temperature())
+        self.set_black_level(temperature = None) #self.get_temperature())
 
         self.imager.setformat(self.bpp, self.width,
                               self.height, self.widthDMA, self.heightDMA, True)
@@ -669,16 +674,24 @@ class Mira050(Sensor):
 
 
     def set_black_level(self, target=128, temperature = None):
-        """set black level, optionally provide temperature to do temp dependent calibration"""
+        """set black level, optionally provide temperature to do temp dependent calibration
+        target is for 12bit"""
         
         LUT = {'8bit': {1: 160, 2: 230, 4: 440, 16: 1700},
-               '10bit': {1: 440, 2: 692, 4: 1140},
+               '10bit': {1: 440, 2: 692, 4: 1140, 8: 2720, 16: 4500},
                '10bithighspeed': {1: 580, 2: 860, 4: 1700},
                '12bit': {1: 1700, 2: 2720, 4: 4500}}
         if self.bpp==10:
             target = target/4
         if self.bpp==8:
             target = target/16
+        # if self.bpp==10 and self.analog_gain==8:
+        #     bpp=12
+        #     analog_gain=2
+        # if self.bpp==10 and self.analog_gain==16:
+        #     bpp=12
+        #     analog_gain=4
+
         scale_factor = 2**(12-self.bpp) * (4/self.analog_gain)
         dn_per_degree = -2.64662 / scale_factor
 
