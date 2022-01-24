@@ -239,17 +239,17 @@ def test_mira050():
     # imager.getSensorID()
     # sensor = Mira050(imager)
     # sensor.cold_start()
-    sensor.init_sensor(bit_mode='10bit', analog_gain=8)
+    sensor.init_sensor(bit_mode='12bit', analog_gain=1)
     sensor.illum_trig(False)
-    # sensor.led_driver=[1,650,60]
+    sensor.led_driver=[1,650,60]
 
     # sensor.imager.enablePrint()
     # sensor.get_temperature()
-    sensor.set_exposure_us(time_us = 150)
+    sensor.set_exposure_us(time_us = 100)
     # ina3221(imager)
-    time.sleep(0.4)
-    images = sensor.imager.grab_images(count =20)
-    sensor.imager.save_images(imgs=images, dir_fname = '/home/jetcis/10bgain8')
+    time.sleep(0.04)
+    images = sensor.imager.grab_images(count =5)
+    sensor.imager.save_images(imgs=images, dir_fname = './8bgain1')
 
     statistics(images)
 
@@ -853,11 +853,11 @@ def run():
     # test stability switching between v4l2 and gstreamer pipeline
     # test_mira220()
     # test_sensor_type()
-    test_mira050()
+    # test_mira050()
     # test_mira130()
     # test_mira030()
     # test_mira050_lowfpn()
-    # get_otp_050()
+    get_otp_050()
     #test_sensor_type()
     # check_calibrate_mira050()
     # automated_measurement()

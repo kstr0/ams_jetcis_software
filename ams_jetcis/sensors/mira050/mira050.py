@@ -31,7 +31,7 @@ class Mira050(Sensor):
         self.height = 800
         self.widthDMA = 608
         self.heightDMA = 800
-        self.fps = 60
+        self.fps = 30
         self.dtMode = 0
         self.sensor_i2c = 54
         self.sensor_type = 1
@@ -73,9 +73,7 @@ class Mira050(Sensor):
             '10bit': {
                 1: r'low_fpn/10-bit mode_anagain1_60fps_exp0.1ms_continuous_clk_datarate_1200_mclk_24.txt', \
                 2: r'low_fpn/10-bit mode_anagain2_60fps_exp0.1ms_continuous_clk_datarate_1200_mclk_24.txt', \
-                4: r'low_fpn/10-bit mode_anagain4_60fps_exp0.1ms_continuous_clk_datarate_1200_mclk_24.txt',
-                8: r'low_fpn/10_anagain8_30fps_exp0.1ms_continuous_clk_datarate_1200_mclk_24.txt',\
-                16: r'low_fpn/10_anagain16_30fps_exp0.1ms_continuous_clk_datarate_1200_mclk_24.txt'}, \
+                4: r'low_fpn/10-bit mode_anagain4_60fps_exp0.1ms_continuous_clk_datarate_1200_mclk_24.txt'}, \
             '10bithighspeed': {
                 1: r'low_fpn/10-bit high speed mode_anagain1_60fps_exp0.1ms_continuous_clk_datarate_1200_mclk_24.txt', \
                 2: r'low_fpn/10-bit high speed mode_anagain2_60fps_exp0.1ms_continuous_clk_datarate_1200_mclk_24.txt', \
@@ -485,10 +483,10 @@ class Mira050(Sensor):
             self.init_from_config(self.config_parser(self.mode_table[bit_mode][analog_gain]))
 
         self.bit_mode = bit_mode
-        # self._analog_gain= analog_gain
-        # self.set_bsp(self.bsp)
-        # self.set_pixel_correction(self.pixel_correction)
-        # self.set_digital_gain(self.digital_gain)
+        self._analog_gain= analog_gain
+        self.set_bsp(self.bsp)
+        self.set_pixel_correction(self.pixel_correction)
+        self.set_digital_gain(self.digital_gain)
         self.set_mirror(self.mirror)
         self.set_exposure_us(self.exposure_us)
         self.width = 600
@@ -498,8 +496,8 @@ class Mira050(Sensor):
         if self.bpp==8:
             self.widthDMA = 640
         self.framerate = 60
-        # self.analog_gain = analog_gain
-        # self.set_black_level(temperature = self.temperature) #self.get_temperature())
+        self.analog_gain = analog_gain
+        self.set_black_level(temperature = self.temperature) #self.get_temperature())
 
         self.imager.setformat(self.bpp, self.width,
                               self.height, self.widthDMA, self.heightDMA, True)
@@ -645,6 +643,7 @@ class Mira050(Sensor):
 
         # Character "ETX" (0x03) indicates the end of the wafer ID string
         wafer_id_bytes = bytes_arr.split(b'\x03')[0]
+        print(f'id bytes: {(wafer_id_bytes)}')
        
         return  int.from_bytes(wafer_id_bytes, byteorder='little', signed=False)
 
@@ -673,7 +672,7 @@ class Mira050(Sensor):
         """set black level, optionally provide temperature to do temp dependent calibration"""
         
         LUT = {'8bit': {1: 160, 2: 230, 4: 440, 16: 1700},
-               '10bit': {1: 440, 2: 692, 4: 1140, 8: 2720, 16: 4500},
+               '10bit': {1: 440, 2: 692, 4: 1140},
                '10bithighspeed': {1: 580, 2: 860, 4: 1700},
                '12bit': {1: 1700, 2: 2720, 4: 4500}}
         if self.bpp==10:
