@@ -29,13 +29,17 @@ class Automated_measurement():
 
     def __init__(self) -> None:
         self.temperature = 25
-        self.test_case = 'illum_25_nolens'
+        self.test_case = 'illum_25_x16_nolens'
+        # self.test_case = 'illum_25_nolens2'
         self.device = 0  # camera port, 0 or 1
         self.sensor = 'mira050'
         self.bitmodes = ['10bit']  # ,'10bit', '10bithighspeed']
-        self.exposures_us = np.arange(100,1000,50)#[100, 350, 700, 1750, 3500, 5250, 7000, 10000, 20000]  # np.arange(100, 1000, 200)
-        self.exposures_us = np.append(self.exposures_us,np.arange(1000,20000,2000))
-        self.agains = [1] #, 2, 4, 8, 16]
+        # self.exposures_us = [100, 350, 700, 1750, 3500, 5250, 7000, 10000, 20000]  # np.arange(100, 1000, 200)
+        self.exposures_us = np.arange(100,800,20)#[100, 350, 700, 1750, 3500, 5250, 7000, 10000, 20000]  # np.arange(100, 1000, 200)
+        # self.exposures_us = np.append(self.exposures_us,np.arange(3000,20000,2000))
+        self.agains = [16]#,4,8,16] #, 2, 4, 8, 16]
+        # self.agains = [1,4,8,16] #, 2, 4, 8, 16]
+
         self.dgains = [1]  # ,4]
         self.pictures_per_shot = 5
         self.timestring = str(int(time.time()))
@@ -134,7 +138,7 @@ class Automated_measurement():
 def run():
     m = Automated_measurement()
     m.capture()
-    m.process()
+    # m.process()
 
 
 if __name__ == '__main__':
