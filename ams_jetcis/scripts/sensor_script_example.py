@@ -239,27 +239,27 @@ def test_mira050():
     # imager.getSensorID()
     # sensor = Mira050(imager)
     # sensor.cold_start()
-    sensor.init_sensor(bit_mode='10bit', analog_gain=1)
+    sensor.init_sensor(bit_mode='12bit', analog_gain=1)
     sensor.illum_trig(False)
     sensor.led_driver=[1,650,60]
 
     # sensor.imager.enablePrint()
     # sensor.get_temperature()
-    sensor.set_exposure_us(time_us = 200)
+    sensor.set_exposure_us(time_us = 100)
     # ina3221(imager)
-    time.sleep(0.4)
-    images = sensor.imager.grab_images(count =10)
+    time.sleep(0.04)
+    images = sensor.imager.grab_images(count =5)
     sensor.imager.save_images(imgs=images, dir_fname = './8bgain1')
 
     statistics(images)
 
 def automated_measurement_050():
-    comment = 'illuminated'
+    comment = 'black'
     test_case = 1
     temperature = 25
     device = 0
     sensor = 'mira050'
-    bitmodes =  ['10bit']#, '12bit', '10bithighspeed']
+    bitmodes =  ['12bit']#, '12bit', '10bithighspeed']
     exposures_us = [100]  # np.arange(0,100,2)
     agains = [1]
     dgains = [1]
@@ -599,7 +599,7 @@ def find_sat_exposure_time(sensor, guard_banded=1.1, roi_process_w=None, roi_pro
     '''
     
     # Find saturation DN value
-    sensor.exposure_us = sensor.lines_to_time(2) # dummy otherwise black image
+    sensor.exposure_us = sensor.get_exposure_limit()['min_exp_time'] # dummy otherwise black image
     time.sleep(0.5)
     exp_max = 1e6 / sensor.fps - 1e3 # Assumption: FOT+readout < 1ms
     sensor.exposure_us = exp_max
@@ -611,7 +611,7 @@ def find_sat_exposure_time(sensor, guard_banded=1.1, roi_process_w=None, roi_pro
                             sensor.bpp, 'Find saturation level', imgs_roi.shape[2], imgs_roi.shape[1])
 
     # Find two points on the response curve
-    sensor.exposure_us = sensor.lines_to_time(2)
+    sensor.exposure_us = sensor.get_exposure_limit()['min_exp_time'] + sensor.lines_to_time(2)
     exp1 = sensor.exposure_us
     time.sleep(0.5)
     imgs = sensor.imager.grab_images(2)
@@ -619,7 +619,7 @@ def find_sat_exposure_time(sensor, guard_banded=1.1, roi_process_w=None, roi_pro
     temp_mean_1 = np.mean(imgs_roi)
     plotter.image_with_rect(imgs[0], exp1, temp_mean_1, np.mean(np.var(imgs_roi, axis=0, ddof=1)), 
                             sensor.bpp, 'Searching with low exposure time', roi_process_w, roi_process_h)
-    sensor.exposure_us = sensor.lines_to_time(10)
+    sensor.exposure_us = sensor.get_exposure_limit()['min_exp_time'] + sensor.lines_to_time(10)
     exp2 = sensor.exposure_us
     time.sleep(0.5)
     imgs = sensor.imager.grab_images(2)
@@ -643,9 +643,11 @@ def find_sat_exposure_time(sensor, guard_banded=1.1, roi_process_w=None, roi_pro
     # Check if saturation guess is okay
     temp_mean = 0
     exp_sat_guard_banded = exp_sat_limit
-    while (sat_limit - temp_mean) >= 2:
+    while abs(sat_limit - temp_mean) >= 2:
         exp_sat_guard_banded *= guard_banded
         sensor.exposure_us = exp_sat_guard_banded
+        if sensor.exposure_us > (1 / sensor.fps) * 1e6:
+            raise ValueError(f'The exposure time is bigger than the frame time') # Just increase illumination instead of fps
         time.sleep(0.5)
         imgs = sensor.imager.grab_images(2)
         imgs_roi = apply_process_roi(imgs, roi_process_w, roi_process_h)
@@ -853,11 +855,11 @@ def run():
     # test stability switching between v4l2 and gstreamer pipeline
     # test_mira220()
     # test_sensor_type()
-    test_mira050()
+    # test_mira050()
     # test_mira130()
     # test_mira030()
     # test_mira050_lowfpn()
-    # get_otp_050()
+    get_otp_050()
     #test_sensor_type()
     # check_calibrate_mira050()
     # automated_measurement()

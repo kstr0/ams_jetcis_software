@@ -17,7 +17,6 @@ class AddressField(NamedTuple):
         return (value & self.mask) << self.shift
 
 
-
 class Mira050(Sensor):
     """
     Implementation of Sensor class for Mira050.
@@ -31,7 +30,7 @@ class Mira050(Sensor):
         self.height = 800
         self.widthDMA = 608
         self.heightDMA = 800
-        self.fps = 30
+        self.fps = 60
         self.dtMode = 0
         self.sensor_i2c = 54
         self.sensor_type = 1
@@ -47,6 +46,7 @@ class Mira050(Sensor):
         self.low_fpn=True
         self.illum = False
         self.clock = 38.4
+        self.data_rate = 1200
         self._led_driver = [None, None, None]
 
         self.mode_table =  {
@@ -110,24 +110,45 @@ class Mira050(Sensor):
         super().__init__(imagertools)
 
 
-    def ina_present(self):
-        self.imager.setSensorI2C(65)
-        self.imager.type(2)  # reg=16bit, val=8bit
-        print(self.imager.read(0xFF) )
+    def set_i2c_address(self, ic):
+        '''Set the I2C address and the I2C bit depth of register and value.
 
+        Parameters
+        ----------
+        ic : str
+            Integrated circuit on the PCB
+        '''
+        if ic == 'sensor':
+            self.imager.setSensorI2C(0x36)
+            self.imager.type(1)
+        elif ic == 'pmic':
+            self.imager.setSensorI2C(0x2d)
+            self.imager.type(0)
+        elif ic == 'illumination':
+            self.imager.setSensorI2C(0x53)
+            self.imager.type(0)
+        elif ic == 'uC':
+            self.imager.setSensorI2C(0x0a)
+            self.imager.type(0)
+        elif ic == 'power':
+            self.imager.setSensorI2C(0x41)
+            self.imager.type(2)
+
+
+    def ina_present(self):
+        self.set_i2c_address('power')
         if (self.imager.read(0xFF)==0x3220): 
-            self.imager.setSensorI2C(self.sensor_i2c)
-            self.imager.type(self.sensor_type)  # reg=16bit, val=8bit
+            self.set_i2c_address('sensor')
             print('ina detected, sensor board mira050 is used')
             return True
         else:   
             print('ina not detected, probably interposer')
             return False
 
+
     def illum_trig(self, value):
         self.illum=value
-        self.imager.setSensorI2C(self.sensor_i2c)
-        self.imager.type(self.sensor_type)  # reg=16bit, val=8bit
+        self.set_i2c_address('sensor')
         self.imager.write(0xE004,0)
         self.imager.write(0xE000,1)
         temp=self.imager.read(0x001C)
@@ -141,7 +162,6 @@ class Mira050(Sensor):
         # self.imager.write(0x0016,8) #no delay
 
 
-
     @property
     def led_driver(self):
         '''Get the programmed settings of the led driver.
@@ -153,15 +173,14 @@ class Mira050(Sensor):
             [1] : current level in mA
             [2] : time-out time in ms
         '''
-        self.imager.setSensorI2C(0x53)
-        self.imager.type(0)
+        self.set_i2c_address('illumination')
         enable = 0 if (self.imager.read(0x10) % (2**4)) == 0x08 else 1
         current = ([80, 150, 220, 280] + list(range(350, 1020, 60)))[self.imager.read(0xb0) % (2**4)]
         timeout = ([60] + list(range(125, 760, 125)) + [1100])[self.imager.read(0xc0) % (2**3)]
         self._led_driver = [enable, current, timeout]
-        self.imager.setSensorI2C(self.sensor_i2c)
-        self.imager.type(self.sensor_type)  # reg=16bit, val=8bit
+        self.set_i2c_address('sensor')
         return self._led_driver
+
 
     @led_driver.setter
     def led_driver(self, led_driver):
@@ -174,8 +193,7 @@ class Mira050(Sensor):
             [1] : Desired current level in mA (80, 150, 220, 280, 350, 410, 470, 530, 590, 650, 710, 770, 830, 890, 950 or 1010)
             [2] : Time-out time in ms (60, 125, 250, 375, 500, 625, 750 or 1100)
         '''
-        self.imager.setSensorI2C(0x53)
-        self.imager.type(0)
+        self.set_i2c_address('illumination')
         [enable, current, timeout] = led_driver
         if enable == 1:
             self.write_register(0x10, 0x01) # torch enable = blinks with strobe
@@ -198,8 +216,8 @@ class Mira050(Sensor):
                 self._led_driver[2] = current
             except:
                 raise ValueError(f'Led driver timeout of {timeout}ms is not supported.')
-        self.imager.setSensorI2C(self.sensor_i2c)
-        self.imager.type(self.sensor_type)  # reg=16bit, val=8bit
+        self.set_i2c_address('sensor')
+
 
     def config_parser(self, fname):
         config_file_path = pathlib.Path(__file__).parent.absolute()/'config_files'/fname
@@ -220,10 +238,10 @@ class Mira050(Sensor):
         self.reg_seq=reg_seq
         return reg_seq
 
+
     def init_from_config(self,reg_seq):
         imager = self.imager
-        imager.setSensorI2C(self.sensor_i2c)
-        imager.type(1)
+        self.set_i2c_address('sensor')
         self.imager.write(0xE000, 0)
         time.sleep(0.01)
         self.imager.disablePrint()
@@ -231,9 +249,9 @@ class Mira050(Sensor):
             imager.write(int(addr), int(reg))
         self.software_trigger()
 
+
     def software_trigger(self):
-        self.imager.setSensorI2C(0x36)
-        self.imager.type(1)
+        self.set_i2c_address('sensor')
         self.imager.write(0xE000, 0)
         self.imager.write(0xE004, 0)
         self.imager.write(0x00A,1)
@@ -252,8 +270,7 @@ class Mira050(Sensor):
         # 11/12 i/o direction, 15/16 output high/low
         # uC, set atb and jtag high
         # WARNING this only works on interposer v2 if R307 is not populated. otherwise, invert the bit for ldo
-        self.imager.setSensorI2C(0x0A)
-        self.imager.type(0)
+        self.set_i2c_address('uC')
         self.imager.write(12, 0b11110111)
         self.imager.write(16, 0b11111111) #ldo en:0
         self.imager.write(11, 0b11001111)
@@ -261,8 +278,7 @@ class Mira050(Sensor):
         self.imager.write(6, 1) #write
 
 
-        self.imager.setSensorI2C(0x2d)
-        self.imager.type(0)  # Reg=8bit, val=8bit
+        self.set_i2c_address('pmic')
         #### Disable master switch ####
         self.imager.write(0x62, 0x00)
         # Set all voltages to 0
@@ -374,7 +390,6 @@ class Mira050(Sensor):
         self.imager.write(0x21, 0b10010000)
 
 
-
         # Enable green LED
         time.sleep(50e-4)
         self.imager.write(0x42, 0x15)  # gpio2
@@ -393,27 +408,20 @@ class Mira050(Sensor):
         # led seq -- use this to turn on leds. abc0000- 1110000 for all leds
         self.imager.write(0x61, 0b10000)
 
-
         # uC, set atb and jtag high and ldo_en
-        self.imager.setSensorI2C(0x0A)
-        self.imager.type(0)
+        self.set_i2c_address('uC')
         self.imager.write(12, 0b11110111)
         self.imager.write(16, 0b11110111) #ldo en:0
         self.imager.write(11, 0b11001111)
         self.imager.write(15, 0b11111111)
         self.imager.write(6, 1) #write
 
-
         time.sleep(0.01)
         self.imager.reset(3) #release in reset
         time.sleep(0.1)
 
-    
-
-
         # Init sensor
-        self.imager.setSensorI2C(0x36)
-        self.imager.type(1)  # reg=16bit, val=8bit
+        self.set_i2c_address('sensor')
         # Set input clock speed to 24MHz
         # self.imager.setmclk(24000000)
         self.imager.setDelay(0)
@@ -423,14 +431,12 @@ class Mira050(Sensor):
         val = self.imager.read(0x11b)
 
 
-
     def check_sensor(self):
         """
         check if sensor is present. Return 0 if detected.
         """
         # checksensor
-        self.imager.setSensorI2C(0x36)
-        self.imager.type(1)
+        self.set_i2c_address('sensor')
         self.imager.write(0xE000, 0)
         self.imager.write(0xE004, 0)
         # Read ID 0x3=?, 0x4=?
@@ -440,19 +446,18 @@ class Mira050(Sensor):
         print(f'version is {val}')
         if val == 33:
             print('mira050 detected')
-            self.imager.setSensorI2C(0x2d)
-            self.imager.type(0)  # Reg=8bit, val=8bit
+            self.set_i2c_address('pmic')
             # led seq -- use this to turn on leds. abc0000- 1110000 for all leds
             self.imager.write(0x61, 0b110000)
             return 0
         else:
-            self.imager.setSensorI2C(0x2d)
-            self.imager.type(0)  # Reg=8bit, val=8bit
+            self.set_i2c_address('pmic')
             # led seq -- use this to turn on leds. abc0000- 1110000 for all leds
             self.imager.write(0x61, 0b1010000)
             return 1
 
-    def init_sensor(self, bit_mode='10bit', fps=30, w=600, h=800, nb_lanes=1, analog_gain=1):
+
+    def init_sensor(self, bit_mode='10bit', fps=60, w=600, h=800, nb_lanes=1, analog_gain=1):
         """ 
         supported bit modes: '10bit', '12bit', '10bithighspeed' '8bit'
         supported analog gains: 1 2 4
@@ -489,7 +494,7 @@ class Mira050(Sensor):
             self.init_from_config(self.config_parser(self.mode_table[bit_mode][analog_gain]))
 
         self.bit_mode = bit_mode
-        self._analog_gain= analog_gain
+        self._analog_gain = analog_gain
         self.set_bsp(self.bsp)
         self.set_pixel_correction(self.pixel_correction)
         self.set_digital_gain(self.digital_gain)
@@ -503,9 +508,11 @@ class Mira050(Sensor):
             self.widthDMA = 640
         self.framerate = 60
         self.set_black_level(temperature = None) #self.get_temperature())
+        self.data_rate = 1200
 
         self.imager.setformat(self.bpp, self.width,
                               self.height, self.widthDMA, self.heightDMA, True)
+
 
     def set_pixel_correction(self,value = True):
             # readout amount of defects
@@ -516,8 +523,7 @@ class Mira050(Sensor):
         high=2
         low=2
         highmode=0
-        imager.setSensorI2C(0x36)
-        imager.type(1)
+        self.set_i2c_address('sensor')
         imager.write(0xE000,0) # banksel
         imager.write(0x0057,on) # defectON
         imager.write(0x0058,mode) # mode
@@ -532,8 +538,7 @@ class Mira050(Sensor):
     #     """
     #     self.init_sensor(bit_mode='12bit', analog_gain=4)
     #     self.set_exposure_us(100)
-    #     self.imager.setSensorI2C(0x36)
-    #     self.imager.type(1)
+    #     self.set_i2c_address('sensor')
     #     self.imager.write(0xe000,0)
     #     self.imager.write(0x0193,0x11)
     #     self.imager.write(0x0194,0x94)
@@ -548,8 +553,7 @@ class Mira050(Sensor):
         """
         reg = addr_field.addr
 
-        self.imager.setSensorI2C(self.sensor_i2c)
-        self.imager.type(self.sensor_type)
+        self.set_i2c_address('sensor')
         self.imager.write(0xe000,0)
         self.imager.write(0x0066,0x0)
         self.imager.write(0x0067,reg)
@@ -569,8 +573,6 @@ class Mira050(Sensor):
         # print(f'OTP data reg {reg}: {bin(val)}')
 
         return addr_field.get_value(val)
-
-
 
 
     def get_wafer_id(self) -> str:
@@ -594,6 +596,7 @@ class Mira050(Sensor):
         wafer_id_bytes = bytes_arr.split(b'\x03')[0]
         return wafer_id_bytes.decode('utf-8')
 
+
     def get_wafer_x_location(self) -> int:
         """Get the die's x-location on the wafer as a signed short (16-bit)."""
         self.BYTES_PER_ADDR=4
@@ -610,7 +613,6 @@ class Mira050(Sensor):
         # Character "ETX" (0x03) indicates the end of the wafer ID string
         wafer_id_bytes = bytes_arr.split(b'\x03')[0]     
         return  int.from_bytes(wafer_id_bytes, byteorder='little', signed=True)
-
 
 
     def get_wafer_y_location(self) -> int:
@@ -652,6 +654,7 @@ class Mira050(Sensor):
        
         return  int.from_bytes(wafer_id_bytes, byteorder='little', signed=False)
 
+
     def get_map_version(self) -> int:
         """Chuck Setting [°C] for Sort #1 (16-bit) INT16."""
         # result = self._get_data_from_otp(AddressField(0x19, 0x0000FFFF, 0))
@@ -669,8 +672,6 @@ class Mira050(Sensor):
         # Character "ETX" (0x03) indicates the end of the wafer ID string
         wafer_id_bytes = bytes_arr.split(b'\x03')[0]     
         return  int.from_bytes(wafer_id_bytes, byteorder='little', signed=True)
-
-
 
 
     def set_black_level(self, target=128, temperature = None):
@@ -715,49 +716,43 @@ class Mira050(Sensor):
         print(f'Scale factor is {scale_factor}')
         print(f'Temperature is {temperature}')
 
-        self.imager.setSensorI2C(self.sensor_i2c)
-        self.imager.type(1)
+        self.set_i2c_address('sensor')
         self.imager.write(0xe000, 0)
         self.imager.write(0x0193, offset_clip >> 8 & 255)
         self.imager.write(0x0194, offset_clip & 255)
-
-                
+      
 
     def set_bsp(self,value = True):
         """black sun protect"""
         # Change bit 3
         self.bsp = value
         imager = self.imager
+        self.set_i2c_address('sensor')
         if (value == True):
-            imager.setSensorI2C(0x36)
-            imager.type(1)
             imager.write(0xe004, 0)
             imager.write(0xe000, 0)
             imager.write(0x1b5, 1)
         else:
-            imager.setSensorI2C(0x36)
-            imager.type(1)
             imager.write(0xe004, 0)
             imager.write(0xe000, 0)
             imager.write(0x1b5, 0)
+
 
     def set_mirror(self, value = False):
         # Get the driver access
         imager = self.imager
         self.mirror = value
         # Change bit 3
+        self.set_i2c_address('sensor')
         if (value == 1):
-            imager.setSensorI2C(0x36)
             imager.write(0xe004, 0)
             imager.write(0xe000, 1)
             imager.write(0xe030, 1)
         else:
-            imager.setSensorI2C(0x36)
             imager.write(0xe004, 0)
             imager.write(0xe000, 1)
             imager.write(0xe030, 0)
     
-
 
     def get_temperature(self):
         # For 12-bit, Analog Gain x1
@@ -766,10 +761,7 @@ class Mira050(Sensor):
         tsens_slope = 1.29
         tsens_offset = 400
         
-
-
-        self.imager.setSensorI2C(0x36)
-        self.imager.type(1)
+        self.set_i2c_address('sensor')
         self.imager.write(0xE000, 0) # banksel
         
         self.imager.write(0x74, 1)
@@ -785,74 +777,92 @@ class Mira050(Sensor):
         return temp
 
 
+    def get_exposure_limit(self):
+        '''Get the exposure time limit.
+
+        Returns
+        -------
+        dict : 
+            min_exp_time : minimum possible exposure time in us in internal mode
+        '''
+        self.set_i2c_address('sensor')
+        self.imager.write(0xe000, 0)
+        lut_del_008 = self.imager.read(0x0176)
+        gran_tg = self.imager.read(0x016D)
+        seq_time_base = 8 / self.data_rate
+        min_exp_time = (151 + lut_del_008) * gran_tg * seq_time_base #u𝑠
+        return {'min_exp_time': min_exp_time + self.lines_to_time(1)}
+
+
+    def get_time_unit_us(self):
+        self.set_i2c_address('sensor')
+        aon_time_base = 1 / (self.clock * 1e6)
+        self.imager.write(0xe000, 0)
+        clocks_per_time_unit = (self.imager.read(0x0012) << 8) + self.imager.read(0x0013)
+        return clocks_per_time_unit * aon_time_base * 1e6 #us
+
+
+    def lines_to_time(self, nb_time_units):
+        '''Convert number of time_units to time.
+        
+        Parameters
+        ----------
+        nb_time_units : int
+            Amount of time_units
+        
+        Returns
+        -------
+        float :
+            Time in us
+        '''
+        return nb_time_units * self.get_time_unit_us()
+
 
     def set_exposure_us(self, time_us):
-        self._exposure_us = time_us
-        imager = self.imager
-        imager.setSensorI2C(self.sensor_i2c)
-        imager.type(self.sensor_type)
 
-        value = int(time_us)
+        self.set_i2c_address('sensor')
 
-        # Split value
-        b3 = value >> 24 & 255
-        b2 = value >> 16 & 255
-        b1 = value >> 8 & 255
-        b0 = value & 255
+        def write_values(sensor, value):
+            split_value = lambda x, y: x >> (8*y) & 255
+            sensor.imager.write(0xe004,  0)
+            sensor.imager.write(0xe000,  1)
+            sensor.imager.write(0x000E, split_value(value, 3))
+            sensor.imager.write(0x000F, split_value(value, 2))
+            sensor.imager.write(0x0010, split_value(value, 1))
+            sensor.imager.write(0x0011, split_value(value, 0))
 
-        imager.write(0xe004,  0)
-        imager.write(0xe000,  1)
-        imager.write(0x000E, b3)
-        imager.write(0x000F, b2)
-        imager.write(0x0010, b1)
-        imager.write(0x0011, b0)
+        min_exp_time = self.get_exposure_limit()['min_exp_time']
+
+        if time_us < min_exp_time:
+            exp_time = int(min_exp_time / self.get_time_unit_us())
+            write_values(self, exp_time)
+            self._exposure_us = min_exp_time
+            raise ValueError(f'The exposure time of {time_us}us is too low')
+        else:
+            exp_time = int(time_us / self.get_time_unit_us())
+            write_values(self, exp_time)
+            self._exposure_us = time_us
+
 
     def set_analog_gain(self, gain):
-        self.init_sensor(self, bit_mode=self.bit_mode, fps=self.fps, w=self.width, h=self.height, nb_lanes=1, analog_gain=gain)
+        self.init_sensor(bit_mode=self.bit_mode, fps=self.fps, w=self.width, h=self.height, nb_lanes=1, analog_gain=gain)
 
     
     def set_digital_gain(self, gain):
         imager = self.imager
-        imager.setSensorI2C(self.sensor_i2c)
-        imager.type(self.sensor_type)
-
-        gain = int(gain*16-1)
-        self.digital_gain = float((gain+1)/16)
-        # Get the driver access
-        imager.setSensorI2C(0x36)
-        imager.type(1)
-        imager.write(0xe004,  0)
-        imager.write(0xe000,  1)
-        imager.write(0x0024,gain)
-        return super().set_digital_gain(gain)
-
-    def write_register(self, address, value):
-        return super().write_register(address, value)
-
-    def read_register(self, address):
-        return super().read_register(address)
-
-
-    def set_analog_gain(self, gain):
-        return super().set_analog_gain(gain)
-
-    def set_digital_gain(self, gain):
-        imager = self.imager
-        imager.setSensorI2C(self.sensor_i2c)
-        imager.type(self.sensor_type)
+        self.set_i2c_address('sensor')
 
         gain = int(gain*16-1)
         self._digital_gain = float((gain+1)/16)
-        # Get the driver access
-        imager.setSensorI2C(0x36)
-        imager.type(1)
-        imager.write(0xe004,  0)
-        imager.write(0xe000,  1)
-        imager.write(0x0024,gain)
-        return super().set_digital_gain(gain)
+
+        imager.write(0xe004, 0)
+        imager.write(0xe000, 1)
+        imager.write(0x0024, gain)
+
 
     def write_register(self, address, value):
         return super().write_register(address, value)
+
 
     def read_register(self, address):
         return super().read_register(address)
@@ -876,15 +886,15 @@ class Mira050(Sensor):
 
     @property
     def analog_gain(self):
-        '''Get the programmed exposure time.
+        '''Get the programmed analog gain.
 
         Returns
         -------
         float : 
             exposure time in us
         '''
-        print('property exposure called')
         return self._analog_gain    
+
 
     @analog_gain.setter
     def analog_gain(self, analog_gain):
@@ -895,9 +905,7 @@ class Mira050(Sensor):
         gain : int
             Analog gain (1, 2 or 4)
         '''
-        print('setting again with setter')
         self.set_analog_gain(analog_gain)
-
 
 
     @property
@@ -909,8 +917,8 @@ class Mira050(Sensor):
         float : 
             exposure time in us
         '''
-        print('property exposure called')
         return self._digital_gain    
+
 
     @digital_gain.setter
     def digital_gain(self, digital_gain):
@@ -921,7 +929,6 @@ class Mira050(Sensor):
         gain : int
             Analog gain (1, 2 or 4)
         '''
-        print('setting again with setter')
         self.set_digital_gain(digital_gain)
 
 
@@ -934,8 +941,9 @@ class Mira050(Sensor):
         float : 
             exposure time in us
         '''
-        print('property exposure called')
+
         return self._exposure_us    
+
 
     @exposure_us.setter
     def exposure_us(self, time_us):
@@ -946,5 +954,5 @@ class Mira050(Sensor):
         exposure : float
             Exposure time of the sensor
         '''
-        print('setting exposure with setter')
         self.set_exposure_us(time_us)
+

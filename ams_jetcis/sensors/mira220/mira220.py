@@ -1610,7 +1610,7 @@ class Mira220(Sensor):
             exposure_time = self.read_double_register(0x100c) * time_conversion * 1e6
         elif context == 'B':
             exposure_time = self.read_double_register(0x1115) * time_conversion * 1e6
-        [exposure_time_max, _] = self.get_exposure_limit()
+        exposure_time_max = self.get_exposure_limit()['max_exp_time']
         if exposure_time > exposure_time_max: # sensor takes automatically the max possible but keeps the register value
             exposure_time = exposure_time_max
         self._exposure_time = exposure_time
@@ -1621,9 +1621,10 @@ class Mira220(Sensor):
 
         Returns
         -------
-        list : 
-            [0] : maximum possible exposure time in us in master mode
-            [1] : maximum exposure register value
+        dict : 
+            min_exp_time : minimum possible exposure time in us in master mode
+            max_exp_time : maximum possible exposure time in us in master mode
+            max_exp_length : maximum exposure register value
         '''
         self.set_i2c_address('sensor')
         context = self.context_observe
@@ -1635,9 +1636,9 @@ class Mira220(Sensor):
             vsize = self.read_double_register(0x110a) % 0x800
             vblank = self.read_double_register(0x1103)
         time_conversion = row_length / self.f_clk_in
-        exposure_length_max = int(((row_length * (vsize + vblank) - self.fot_length) / self.f_clk_in) / time_conversion)
-        exposure_time_max = exposure_length_max * time_conversion * 1e6
-        return [exposure_time_max, exposure_length_max]
+        max_exp_length = int(((row_length * (vsize + vblank) - self.fot_length) / self.f_clk_in) / time_conversion)
+        max_exp_time = max_exp_length * time_conversion * 1e6
+        return{'min_exp_time': self.lines_to_time(1), 'max_exp_time': max_exp_time, 'max_exp_length': max_exp_length}
 
     @exposure_us.setter
     def exposure_us(self, time_us):
@@ -1651,20 +1652,20 @@ class Mira220(Sensor):
         self.set_i2c_address('sensor')
         context = self.context_observe
         reg_list = {'A':0x100c, 'B':0x1115}
-        [exposure_time_max, exposure_length_max] = self.get_exposure_limit()
-        if time_us > exposure_time_max:
-            time_us = exposure_time_max
-            self.write_double_register(reg_list[context], int(exposure_length_max))
+        exp_limits = self.get_exposure_limit()
+        if time_us > exp_limits['max_exp_time']:
+            self.write_double_register(reg_list[context], int(exp_limits['max_exp_length']))
+            self._exposure_time = exp_limits['max_exp_time']
             raise ValueError(f'The exposure time of {time_us}us is out of the limits')
-        elif time_us < 0:
-            time_us = 0
-            self.write_double_register(reg_list[context], 0)
+        elif time_us < exp_limits['min_exp_time']:
+            self.write_double_register(reg_list[context], 1)
+            self._exposure_time = exp_limits['min_exp_time']
             raise ValueError(f'The exposure time of {time_us}us is out of the limits')
         else:
             time_conversion = self.row_length / self.f_clk_in
             exposure_length = round(time_us / 1e6 / time_conversion)
             self.write_double_register(reg_list[context], int(exposure_length))
-        self._exposure_time = time_us
+            self._exposure_time = time_us
 
     def lines_to_time(self, lines):
         '''Convert lines to time.

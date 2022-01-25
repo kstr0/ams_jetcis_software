@@ -92,6 +92,7 @@ if  [ $nointernet -eq 0 ] ; then
 		python3 -m pip install tqdm
 		python3 -m pip install openpyxl
 		sudo apt install python3-h5py
+		python3 -m pip install kaleido
 	fi
 fi
 
