@@ -1,6 +1,7 @@
 build
 env
 *.pyc
+.ipynb*
  ams_jetcis.egg-info*
  
 .vscode
