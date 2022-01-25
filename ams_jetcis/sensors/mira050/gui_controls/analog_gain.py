@@ -5,7 +5,7 @@ def controlInit():
         "type": "optionmenu",
         "nb_widgets": 1,
         "default_1": 1,
-        "option_list_1": [1,2,4],
+        "option_list_1": [1,2,4,8,16],
         "unit": "per pixel",
     }
     return controlParams
@@ -22,7 +22,10 @@ def controlSet_1(main_app, variable, event=None):
     # # Get option menu value
     analog_gain = int(variable.get())
     # # Get the driver access
-    main_app.sensor.init_sensor(bit_mode=main_app.sensor.bit_mode, analog_gain=analog_gain)
+    if analog_gain>4 and main_app.sensor.bpp!=10:
+        pass
+    else:
+        main_app.sensor.init_sensor(bit_mode=main_app.sensor.bit_mode, analog_gain=analog_gain)
 
     main_app.imager.doWidgetUpdate()
 

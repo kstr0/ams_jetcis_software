@@ -464,7 +464,7 @@ class Mira050(Sensor):
         """
         try: #do some checks
             assert(bit_mode in self.mode_table_low_fpn_38.keys())
-            assert(analog_gain in self.mode_table_low_fpn_38[bit_mode].keys())
+            assert(analog_gain in self.mode_table_low_fpn_24[bit_mode].keys() and (analog_gain in self.mode_table_low_fpn_38[bit_mode].keys() ))
         except AssertionError:
             message = f"Supported modes: {self.mode_table_low_fpn_24.keys()} gains: {self.mode_table_low_fpn_38['10bit'].keys()}"
             raise Mira050ConfigError(bit_mode=bit_mode, analog_gain = analog_gain, message = message)
