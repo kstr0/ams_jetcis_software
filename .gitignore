@@ -3,7 +3,7 @@ env
 *.pyc
 .ipynb*
  ams_jetcis.egg-info*
- 
+*.bak 
 .vscode
 __pycache__
-
+installer*

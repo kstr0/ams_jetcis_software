@@ -91,6 +91,7 @@ if  [ $nointernet -eq 0 ] ; then
 		python3 -m pip install plotly==5.5.0
 		python3 -m pip install tqdm
 		python3 -m pip install openpyxl
+		python3 -m pip install characterization_ams-1.0.4-py3-none-any.whl
 		sudo apt install python3-h5py
 		python3 -m pip install kaleido
 	fi
