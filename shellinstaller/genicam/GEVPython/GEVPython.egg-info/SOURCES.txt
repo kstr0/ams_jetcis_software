@@ -1,6 +1,0 @@
-GEVPython.cpp
-setup.py
-GEVPython.egg-info/PKG-INFO
-GEVPython.egg-info/SOURCES.txt
-GEVPython.egg-info/dependency_links.txt
-GEVPython.egg-info/top_level.txt
