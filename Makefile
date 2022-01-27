@@ -28,6 +28,16 @@ help:: ## Show this help
 	@ egrep -h '\s##\s' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[3	7;1m%-20s\033[0m %s\n", $$1, $$2}'
 
 
+launch_gui::
+	$(PYTHON) -m ams_jetcis 
+launch_notebook::
+	$(PYTHON) -m jupyter notebook 
+
+all::
+	make init
+	make install_system
+	make install_editable
+
 init:: veryclean requirements.txt ## Configure development environment
 	test -d $(VENV_ROOT) || python3 -m virtualenv $(VENV_ROOT) --system-site-packages
 	$(PIP) install -r requirements.txt --upgrade
@@ -36,21 +46,14 @@ init:: veryclean requirements.txt ## Configure development environment
 lala::
 	@ echo $(REPO_ROOT)
 
-launch_gui::
-	$(PYTHON) -m ams_jetcis 
-
-build:: clean ## Process source code into package distributable artifacts
+build:: clean ## Build package
 	$(PYTHON) -m build 
 
-install-editable:: clean ## Process source code into package distributable artifacts
+install_editable:: clean ## Install ams package
 	test -d $(VENV_ROOT) || make init
 	$(PYTHON) -m pip install --editable . 
 
-install::  ## Process source code into package distributable artifacts
-	test -d $(VENV_ROOT) || make init
-	@ echo "ok"
-	source data/install_0.sh
-test:: clean ## Process source code into package distributable artifacts
+test:: clean ## Test code w unit tests
 	$(PYTHON) -m pytest 
 
 clean:: ## Delete all files created through build process
@@ -87,7 +90,7 @@ veryclean:: clean ## Delete all generated files
 		sudo rm /boot/sensor.conf
 	fi
 
-install_system:
+install_system: ## install system packages
 	echo "Update Repository"
 	sudo apt-get update
 
@@ -183,23 +186,23 @@ install_system:
 	echo "Set the script rights accordingly"
 	gio set ~/Desktop/ams_jetcis.desktop "metadata::trusted" yes
 	sudo chmod a+rwx ~/Desktop/ams_jetcis.desktop
-	sudo chmod a+rwx ~/ams/gui.sh
+	# sudo chmod a+rwx ~/ams/gui.sh
 
 	echo "Create Jupyter Notebook Desktop Icon"
 	echo "[Desktop Entry]" > ~/Desktop/jupyter_notebook.desktop
 	echo "Version=1.0" >> ~/Desktop/jupyter_notebook.desktop
 	echo "Type=Application" >> ~/Desktop/jupyter_notebook.desktop
 	echo "Terminal=true" >> ~/Desktop/jupyter_notebook.desktop
-	echo "Exec=$HOME/ams/start_jupyter.sh" >> ~/Desktop/jupyter_notebook.desktop
+	echo "Exec=$(REPO_ROOT) make launch_notebook" >> ~/Desktop/jupyter_notebook.desktop
 	echo "Name=jupyter_notebook" >> ~/Desktop/jupyter_notebook.desktop
 	echo "Comment=jupyter_notebook" >> ~/Desktop/jupyter_notebook.desktop
-	echo "Icon=$HOME/ams/ams_jetcis/button_icons/jupyter_logo.png" >> ~/Desktop/jupyter_notebook.desktop
+	echo "Icon=$(REPO_ROOT)/ams_jetcis/button_icons/jupyter_logo.png" >> ~/Desktop/jupyter_notebook.desktop
 	gio set ~/Desktop/jupyter_notebook.desktop "metadata::trusted" yes
 	sudo chmod a+rwx ~/Desktop/jupyter_notebook.desktop
-	sudo chmod a+rwx ~/ams/start_jupyter.sh
+	# sudo chmod a+rwx ~/ams/start_jupyter.sh
 
 	echo "Set wallpaper"
-	cp desktop-background-ams-OSRAM.jpg $HOME/Pictures
+	cp data/desktop-background-ams-OSRAM.jpg $HOME/Pictures
 	gsettings set org.gnome.desktop.background picture-uri "file://$HOME/Pictures/desktop-background-ams-OSRAM.jpg"
 	echo "installation done."
 	#zenity --info --title "ams_jetcis Installer" --text "Simplified installation is done.\nPlease reboot the system to make sure,\nall changes are applied and then run install 1 and 2.sh if genicam is needed. (usually it is not)" --width=300
@@ -213,4 +216,4 @@ install_system:
 
 .EXPORT_ALL_VARIABLES:
 .ONESHELL:
-.PHONY: help init build clean veryclean install test
+.PHONY: help init all build clean veryclean install test launch_gui launch_notebook install_editable
