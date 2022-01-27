@@ -61,7 +61,7 @@ After installation, open a terminal
 
 `$ cd ~ `
 
-`$ git clone https://github.com/ams-sensors/ams_jetcis_software.git`
+`$ git clone -b stable https://github.com/ams-sensors/ams_jetcis_software.git`
 
 `$ cd ~/ams_jetcis_software `
 
@@ -81,6 +81,7 @@ done.
 `make launch_notebook`
 
 ## from desktop
+
 click the desktop shortcut
 
 
