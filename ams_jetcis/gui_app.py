@@ -28,7 +28,7 @@ from xmlrpc.client import ServerProxy
 
 from ams_jetcis.common.tooltip import CreateToolTip
 from ams_jetcis.common import driver_access
-from ams_jetcis.scripts.Mira050.fullres_mira050 import resetSensor
+# from ams_jetcis.scripts.Mira050.fullres_mira050 import resetSensor
 
 # ams imports
 #sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../'))) #add parent folder to path
