@@ -174,12 +174,26 @@ install_system: ## install system packages
 	sudo chown root:root /var/nvidia/nvcam/settings/camera_overrides.isp
 	sudo chmod 664 /var/nvidia/nvcam/settings/camera_overrides.isp
 
+	echo "Set wallpaper"
+	cp data/desktop-background-ams-OSRAM.jpg $HOME/Pictures
+	gsettings set org.gnome.desktop.background picture-uri "file://$HOME/Pictures/desktop-background-ams-OSRAM.jpg"
+	echo "installation done."
+	#zenity --info --title "ams_jetcis Installer" --text "Simplified installation is done.\nPlease reboot the system to make sure,\nall changes are applied and then run install 1 and 2.sh if genicam is needed. (usually it is not)" --width=300
+
+	#some aliases
+	echo alias python=python3 > ~/.bash_aliases
+
+
+
+	make launcher
+
+launcher:: ## desktop shortcut
 	echo "Create GUI Desktop Icon"
 	echo "[Desktop Entry]" > ~/Desktop/ams_jetcis.desktop
 	echo "Version=1.0" >> ~/Desktop/ams_jetcis.desktop
 	echo "Type=Application" >> ~/Desktop/ams_jetcis.desktop
 	echo "Terminal=true" >> ~/Desktop/ams_jetcis.desktop
-	echo "Exec=$(REPO_ROOT) make launch_gui" >> ~/Desktop/ams_jetcis.desktop
+	echo "Exec= make -C $(REPO_ROOT) launch_gui" >> ~/Desktop/ams_jetcis.desktop
 	echo "Name=ams_osram_jetcis" >> ~/Desktop/ams_jetcis.desktop
 	echo "Comment=ams_osram_jetcis" >> ~/Desktop/ams_jetcis.desktop
 	echo "Icon=$(REPO_ROOT)/ams_jetcis/button_icons/desktop_icon.png" >> ~/Desktop/ams_jetcis.desktop
@@ -193,22 +207,13 @@ install_system: ## install system packages
 	echo "Version=1.0" >> ~/Desktop/jupyter_notebook.desktop
 	echo "Type=Application" >> ~/Desktop/jupyter_notebook.desktop
 	echo "Terminal=true" >> ~/Desktop/jupyter_notebook.desktop
-	echo "Exec=$(REPO_ROOT) make launch_notebook" >> ~/Desktop/jupyter_notebook.desktop
+	echo "Exec=make -C $(REPO_ROOT) launch_notebook" >> ~/Desktop/jupyter_notebook.desktop
 	echo "Name=jupyter_notebook" >> ~/Desktop/jupyter_notebook.desktop
 	echo "Comment=jupyter_notebook" >> ~/Desktop/jupyter_notebook.desktop
 	echo "Icon=$(REPO_ROOT)/ams_jetcis/button_icons/jupyter_logo.png" >> ~/Desktop/jupyter_notebook.desktop
 	gio set ~/Desktop/jupyter_notebook.desktop "metadata::trusted" yes
 	sudo chmod a+rwx ~/Desktop/jupyter_notebook.desktop
 	# sudo chmod a+rwx ~/ams/start_jupyter.sh
-
-	echo "Set wallpaper"
-	cp data/desktop-background-ams-OSRAM.jpg $HOME/Pictures
-	gsettings set org.gnome.desktop.background picture-uri "file://$HOME/Pictures/desktop-background-ams-OSRAM.jpg"
-	echo "installation done."
-	#zenity --info --title "ams_jetcis Installer" --text "Simplified installation is done.\nPlease reboot the system to make sure,\nall changes are applied and then run install 1 and 2.sh if genicam is needed. (usually it is not)" --width=300
-
-	#some aliases
-	echo alias python=python3 > ~/.bash_aliases
 
 
 
