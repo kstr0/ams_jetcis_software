@@ -7,3 +7,4 @@ env
 .vscode
 __pycache__
 installer*
+*.egg-info
