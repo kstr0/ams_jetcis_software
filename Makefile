@@ -37,15 +37,13 @@ all::
 	make init
 	make install_system
 	make install_editable
-        make launcher
+	make launcher
 
 init:: veryclean requirements.txt ## Configure development environment
 	test -d $(VENV_ROOT) || python3 -m virtualenv $(VENV_ROOT) --system-site-packages
 	$(PIP) install -r requirements.txt --upgrade
 	$(PIP) freeze
 
-lala::
-	@ echo $(REPO_ROOT)
 
 build:: clean ## Build package
 	$(PYTHON) -m build 
@@ -185,8 +183,6 @@ install_system:: ## install system packages
 	echo alias python=python3 > ~/.bash_aliases
 
 
-
-	make launcher
 
 launcher:: ## desktop shortcut
 	echo "Create GUI Desktop Icon"
