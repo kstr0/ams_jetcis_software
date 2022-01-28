@@ -40,6 +40,8 @@ all:: ## full install, recommended
 	make launcher
 	make init_notebook
 
+update:: init install_editable launcher init_notebook
+
 activate:: #activate venv
 	bash -c "source $(VENV_ROOT)/bin/activate"
 

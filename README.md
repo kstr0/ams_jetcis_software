@@ -85,3 +85,10 @@ done.
 click the desktop shortcut
 
 
+# 4. Updating the application:
+
+If you have executed steps 2 and 3 before, you can update your local repository using:
+
+`$ git pull`
+
+`$ make update`
