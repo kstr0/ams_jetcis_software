@@ -37,6 +37,7 @@ all::
 	make init
 	make install_system
 	make install_editable
+        make launcher
 
 init:: veryclean requirements.txt ## Configure development environment
 	test -d $(VENV_ROOT) || python3 -m virtualenv $(VENV_ROOT) --system-site-packages
@@ -90,7 +91,7 @@ veryclean:: clean ## Delete all generated files
 		sudo rm /boot/sensor.conf
 	fi
 
-install_system: ## install system packages
+install_system:: ## install system packages
 	echo "Update Repository"
 	sudo apt-get update
 
