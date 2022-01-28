@@ -65,7 +65,7 @@ After installation, open a terminal
 
 `$ cd ~/ams_jetcis_software `
 
-`make all`
+`$ make all`
 
 done.
 
@@ -76,9 +76,9 @@ done.
 
 `$ cd ~/ams_jetcis_software `
 
-`make launch_gui`
+`$ make launch_gui`
 
-`make launch_notebook`
+`$ make launch_notebook`
 
 ## from desktop
 
