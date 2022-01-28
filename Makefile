@@ -13,7 +13,7 @@ REPO_ROOT ?= $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 SOURCE_ROOT ?= .
 DIST_ROOT ?= dist
 VENV_ROOT ?= venv
-
+NOTEBOOK_ROOT ?= notebooks
 # Executables definition
 PYTHON ?= $(VENV_ROOT)/bin/python3
 PIP = $(PYTHON) -m pip
@@ -28,21 +28,30 @@ help:: ## Show this help
 	@ egrep -h '\s##\s' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[3	7;1m%-20s\033[0m %s\n", $$1, $$2}'
 
 
-launch_gui::
+launch_gui:: ## launch gui with makefile
 	$(PYTHON) -m ams_jetcis 
-launch_notebook::
+launch_notebook:: ## launch notebook
 	$(PYTHON) -m jupyter notebook 
 
-all::
-	make init
+all:: ## full install, recommended
 	make install_system
+	make init
 	make install_editable
 	make launcher
+	make init_notebook
 
-init:: veryclean requirements.txt ## Configure development environment
+activate:: #activate venv
+	bash -c "source $(VENV_ROOT)/bin/activate"
+
+init:: veryclean  ## Configure development environment
 	test -d $(VENV_ROOT) || python3 -m virtualenv $(VENV_ROOT) --system-site-packages
 	$(PIP) install -r requirements.txt --upgrade
 	$(PIP) freeze
+
+init_notebook::
+	$(PIP) install ipykernel
+	$(PYTHON) -m ipykernel install --user --name=python3
+	
 
 
 build:: clean ## Build package
@@ -50,6 +59,7 @@ build:: clean ## Build package
 
 install_editable:: clean ## Install ams package
 	test -d $(VENV_ROOT) || make init
+	$(PIP) install data/characterization_ams*.whl
 	$(PYTHON) -m pip install --editable . 
 
 test:: clean ## Test code w unit tests
@@ -68,26 +78,33 @@ veryclean:: clean ## Delete all generated files
 
 	if [ -d "$HOME/JetCis" ]
 	then
+	 	echo "...remove old Application folder"
+	 	sudo rm -rf ~/ams_jetcis
+		rm ~/Desktop/JetCis.desktop
+	 fi
+	 if [ -d "$HOME/ams_jetcis" ]
+	 then
 		echo "...remove old Application folder"
 		sudo rm -rf ~/ams_jetcis
 		rm ~/Desktop/JetCis.desktop
-	fi
-	if [ -d "$HOME/ams_jetcis" ]
-	then
-		echo "...remove old Application folder"
-		sudo rm -rf ~/ams_jetcis
-		rm ~/Desktop/JetCis.desktop
-	fi
-	if [ -d "$HOME/ams" ]
-	then
+	 fi
+	 if [ -d "$HOME/ams" ]
+	 then
 		echo "...remove old Application folder"
 		sudo rm -rf ~/ams
+	 fi
+	 if [ -f "/boot/sensor.conf" ]
+	 then
+	 	sudo rm /boot/sensor.conf
 	fi
 	
-	if [ -f "/boot/sensor.conf" ]
+	if [ -f " $(HOME)/Desktop/ams_jetcis.desktop" ]
 	then
-		sudo rm /boot/sensor.conf
+		rm  $(HOME)/Desktop/ams_jetcis.desktop
+		rm  $(HOME)/Desktop/jupyter_notebook.desktop
 	fi
+
+
 
 install_system:: ## install system packages
 	echo "Update Repository"
@@ -120,6 +137,11 @@ install_system:: ## install system packages
 	python3 -m pip install -U pip
 	python3 -m pip install virtualenv
 
+	echo " install firefox, remove chrome"
+	sudo apt -y install firefox 
+	sudo apt -y remove chromium-browser 
+
+
 	python3 -m pip install ttkbootstrap==0.5.2
 	sudo cp data/themes_custom.py ~/.local/lib/python3.6/site-packages/ttkbootstrap/themes_custom.py
 
@@ -140,7 +162,6 @@ install_system:: ## install system packages
 	python3 -m pip install plotly==5.5.0
 	python3 -m pip install tqdm
 	python3 -m pip install openpyxl
-	python3 -m pip install characterization_ams-1.0.4-py3-none-any.whl
 	sudo apt install python3-h5py
 	python3 -m pip install kaleido
 
